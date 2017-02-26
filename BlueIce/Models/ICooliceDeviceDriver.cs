@@ -7,6 +7,8 @@ namespace BlueIce
 {
 	public interface ICooliceDeviceDriver
 	{
+		DeviceConnectionState ConnectionState { get; }
+
 		Task<bool> Connect(CooliceDevice device);
 	}
 }

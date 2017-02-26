@@ -3,12 +3,12 @@ namespace BlueIce
 {
 	public class BluetoothConnectionReceivedEventArgs
 	{
-		public bool Connected { get; private set; }
+		public DeviceConnectionState ConnectionState { get; private set; }
 		public Exception Exception { get; private set; }
 
-		public BluetoothConnectionReceivedEventArgs(bool connected, Exception exception = null)
+		public BluetoothConnectionReceivedEventArgs(DeviceConnectionState connectionState, Exception exception = null)
 		{
-			Connected = connected;
+			ConnectionState = connectionState;
 			Exception = exception;
 		}
 	}

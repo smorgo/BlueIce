@@ -94,7 +94,6 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CooliceDeviceDriver.cs" />
-    <Compile Include="ObservableCollection.cs" />
     <Compile Include="CooliceDeviceScanner.cs" />
     <Compile Include="BluetoothService.cs" />
   </ItemGroup>

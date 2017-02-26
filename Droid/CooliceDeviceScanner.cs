@@ -8,8 +8,7 @@ namespace BlueIce.Droid
 {
 	public class CooliceDeviceScanner : ICooliceDeviceScanner
 	{
-		private const int REQUEST_ENABLE_BT = 2;
-		private const string COOLICE_DEVICE_NAME = "IM-V1-161";
+		
 
 		public async Task EnumerateDevices(System.Collections.ObjectModel.ObservableCollection<CooliceDevice> devices)
 		{
@@ -23,7 +22,7 @@ namespace BlueIce.Droid
 				if (!adapter.IsEnabled)
 				{
 					var enableBtIntent = new Intent(BluetoothAdapter.ActionRequestEnable);
-					activity.StartActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+					activity.StartActivityForResult(enableBtIntent, BluetoothService.REQUEST_ENABLE_BT);
 				}
 
 				// Get connected devices

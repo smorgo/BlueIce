@@ -15,7 +15,9 @@ namespace BlueIce.Droid
 	{
 		private const string TAG = "CooliceDeviceDriver";
 		private const int REQUEST_CONNECT_DEVICE = 1;
-		public bool Connected { get; private set; }
+
+		public DeviceConnectionState ConnectionState { get; private set; }
+
 		private BluetoothAdapter _adapter;
 		private BluetoothDevice _device;
 		private BluetoothSocket _socket;
@@ -23,10 +25,12 @@ namespace BlueIce.Droid
 		public CooliceDeviceDriver()
 		{
 			_adapter = BluetoothAdapter.DefaultAdapter;
+			ConnectionState = DeviceConnectionState.Disconnected;
 		}
 
 		public async Task<bool> Connect(CooliceDevice device)
 		{
+			ConnectionState = DeviceConnectionState.Connecting;
 
 			// Get the remote device, the bluetooth address has already been verified
 			_device = _adapter.GetRemoteDevice(device.Address);
@@ -38,9 +42,10 @@ namespace BlueIce.Droid
 			catch (Java.IO.IOException e)
 			{
 				Log.Error(TAG, "Create Socket Failed", e);
+				ConnectionState = DeviceConnectionState.Disconnected;
+				return false;
 			}
 
-			Connected = false;
 			if (_socket != null)
 			{
 				SynchronizationContext currentContext = SynchronizationContext.Current;
@@ -51,11 +56,13 @@ namespace BlueIce.Droid
 						await _socket.ConnectAsync();
 						if (_socket.IsConnected)
 						{
-							Connected = true;
+							ConnectionState = DeviceConnectionState.Connected;
 							currentContext.Post((e) =>
 							{
 								if (device.BluetoothConnectionReceived != null)
-									device.BluetoothConnectionReceived(this, new BluetoothConnectionReceivedEventArgs(Connected));
+								{
+									device.BluetoothConnectionReceived(this, new BluetoothConnectionReceivedEventArgs(ConnectionState));
+								}
 
 							}, null);
 						}
@@ -65,14 +72,17 @@ namespace BlueIce.Droid
 				}
 				catch (Java.IO.IOException ex)
 				{
-					Connected = false;
+					ConnectionState = DeviceConnectionState.Disconnected;
 					currentContext.Post((e) =>
 					{
 						if (device.BluetoothConnectionReceived != null)
-							device.BluetoothConnectionReceived(this, new BluetoothConnectionReceivedEventArgs(Connected, ex));
+						{
+							device.BluetoothConnectionReceived(this, new BluetoothConnectionReceivedEventArgs(ConnectionState, ex));
+						}
 
 					}, null);
 					Log.Error(TAG, "Bluetooth Socket Connection Failed", ex);
+					return false;
 				}
 			}
 
